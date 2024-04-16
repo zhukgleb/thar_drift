@@ -13,13 +13,23 @@ fits_list = os.listdir("data/")
 print(fits_list)
 data_list = []
 
-for i in range(len(fits_list)):
-    with fits.open("data/" + fits_list[i]) as hdul:
-        data_list.append(hdul[0].data[0])
+# for i in range(len(fits_list)):
+#     with fits.open("data/" + fits_list[i]) as hdul:
+#         data_list.append(hdul[0].data[0])
 
-rep_fits = data_list[0]
-shifted = data_list[1]
-# shifted = ndi.shift(rep_fits, (30, 30))
+
+# photo tests
+from skimage import io
+from skimage import util
+ph = io.imread("20240413_0014.jpg") / 255
+rep_fits = ph
+
+shifted = transform.rotate(ph, 45)
+shifted = ndi.shift(shifted, (0, 50))
+# shifted = util.random_noise(shifted, mode='gaussian',
+#                            seed=0, mean=0, var=1e-3)
+# rep_fits = data_list[0]
+# shifted = data_list[1]
 
 def mse(arr1, arr2):
     """Compute the mean squared error between two arrays."""
@@ -58,7 +68,7 @@ def gaussian_pyramid(image, levels=6):
     pyramid = [image]
 
     for level in range(levels - 1):
-        blurred = ndi.gaussian_filter(image, sigma=2/3)
+        # blurred = ndi.gaussian_filter(image, sigma=2/3)
         image = downsample2x(image)
         pyramid.append(image)
 
@@ -105,14 +115,14 @@ def align(reference, target, cost=cost_mse, nlevels=7, method='Powell'):
     return make_rigid_transform(p)
 
 
-tf = align(rep_fits, shifted)
+tf = align(rep_fits, shifted, nlevels=10, method='BH')
 corrected = transform.warp(shifted, tf, order=3)
 
 f, (ax0, ax1, ax2) = plt.subplots(1, 3)
 ax0.imshow(rep_fits)
 ax0.set_title('ref')
 ax1.imshow(shifted)
-ax1.set_title('another thorium')
+ax1.set_title('not ref')
 ax2.imshow(corrected)
 ax2.set_title('compensated')
 for ax in (ax0, ax1, ax2):
