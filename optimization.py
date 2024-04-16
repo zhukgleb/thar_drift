@@ -9,9 +9,6 @@ from skimage import data, color
 from astropy.io import fits
 
 
-# astronaut = color.rgb2gray(data.astronaut())
-# shifted = ndi.shift(astronaut, (30, 30))
-
 fits_list = os.listdir("data/")
 print(fits_list)
 data_list = []
@@ -108,23 +105,16 @@ def align(reference, target, cost=cost_mse, nlevels=7, method='Powell'):
     return make_rigid_transform(p)
 
 
-from skimage import util
-
-theta = 60
-# rotated = transform.rotate(rep_fits, theta)
-# rotated = util.random_noise(rotated, mode='gaussian',
-#                             seed=0, mean=0, var=1e-3)
-
 tf = align(rep_fits, shifted)
 corrected = transform.warp(shifted, tf, order=3)
 
 f, (ax0, ax1, ax2) = plt.subplots(1, 3)
 ax0.imshow(rep_fits)
-ax0.set_title('Original')
+ax0.set_title('ref')
 ax1.imshow(shifted)
-ax1.set_title('Rotated')
+ax1.set_title('another thorium')
 ax2.imshow(corrected)
-ax2.set_title('Registered')
+ax2.set_title('compensated')
 for ax in (ax0, ax1, ax2):
     ax.axis('off')
 plt.show()
