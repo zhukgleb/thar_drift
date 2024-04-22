@@ -7,29 +7,25 @@ from skimage import transform
 import os
 from skimage import data, color
 from astropy.io import fits
-
+from sklearn.preprocessing import Normalizer
 
 fits_list = os.listdir("data/")
 print(fits_list)
 data_list = []
 
-# for i in range(len(fits_list)):
-#     with fits.open("data/" + fits_list[i]) as hdul:
-#         data_list.append(hdul[0].data[0])
+for i in range(len(fits_list)):
+    with fits.open("data/" + fits_list[i]) as hdul:
+        d = hdul[0].data[0]
+        transformer = Normalizer().fit(d)
+        d = transformer.transform(d)
+        data_list.append(d)
+        print(d.shape)
+        
+rep_fits = data_list[0]
 
-
-# photo tests
-from skimage import io
-from skimage import util
-ph = io.imread("20240413_0014.jpg") / 255
-rep_fits = ph
-
-shifted = transform.rotate(ph, 45)
-shifted = ndi.shift(shifted, (0, 50))
-# shifted = util.random_noise(shifted, mode='gaussian',
-#                            seed=0, mean=0, var=1e-3)
-# rep_fits = data_list[0]
-# shifted = data_list[1]
+for i in range(len(data_list)):
+    if len(data_list[i][0]) * 1.1 < len(rep_fits[0]):
+        data_list[i] = data_list[i].T
 
 def mse(arr1, arr2):
     """Compute the mean squared error between two arrays."""
@@ -83,7 +79,7 @@ def make_rigid_transform(param):
 
 def cost_mse(param, reference_image, target_image):
     transformation = make_rigid_transform(param)
-    transformed = transform.warp(target_image, transformation, order=3)
+    transformed = transform.warp(target_image, transformation, order=3, output_shape=(reference_image.shape[0], reference_image.shape[1]))
     return mse(reference_image, transformed)
 
 
@@ -114,17 +110,18 @@ def align(reference, target, cost=cost_mse, nlevels=7, method='Powell'):
     print('')  # newline when alignment complete
     return make_rigid_transform(p)
 
+for i in range(0, len(data_list)):
+    shifted = data_list[i]
+    tf = align(rep_fits, shifted)
+    corrected = transform.warp(shifted, tf, order=3)
 
-tf = align(rep_fits, shifted, nlevels=10, method='BH')
-corrected = transform.warp(shifted, tf, order=3)
-
-f, (ax0, ax1, ax2) = plt.subplots(1, 3)
-ax0.imshow(rep_fits)
-ax0.set_title('ref')
-ax1.imshow(shifted)
-ax1.set_title('not ref')
-ax2.imshow(corrected)
-ax2.set_title('compensated')
-for ax in (ax0, ax1, ax2):
-    ax.axis('off')
-plt.show()
+# f, (ax0, ax1, ax2) = plt.subplots(1, 3)
+# ax0.imshow(rep_fits)
+# ax0.set_title('ref')
+# ax1.imshow(shifted)
+# ax1.set_title('not ref')
+# ax2.imshow(corrected)
+# ax2.set_title('compensated')
+# for ax in (ax0, ax1, ax2):
+#     ax.axis('off')
+# plt.show()
