@@ -10,11 +10,12 @@ import pytz
 meteo_list = os.listdir("meteo/")
 
 # Convert date and time to mod. Julian time
+# I don't give a fuck
 def date_to_mjd(date, time):
     full_time = date + " " + time
     native = dt.strptime(full_time, "%d-%b-%Y %H:%M:%S")
     local = pytz.timezone("Europe/Moscow")
-    local_dt = local.localize(native, is_dst=None)
+    local_dt = local.localize(native)
     utc_dt = local_dt.astimezone(pytz.utc)
     ut = Time(utc_dt, scale="local")
     mjd = ut.mjd
@@ -23,7 +24,7 @@ def date_to_mjd(date, time):
 
 # Extract data from one data file
 def xtract_meteo(path2file):
-    data = np.genfromtxt(path2file, dtype=str)
+    data = np.genfromtxt(path2file, dtype=str, invalid_raise = False)
     date = data[:, 0]
     time = data[:, 1]
     t_out = data[:, 3].astype(float)
@@ -43,6 +44,12 @@ def xtract_meteo(path2file):
     
 
 if __name__ == "__main__":
-    d = xtract_meteo("meteo/" + meteo_list[0])
-    plt.plot(d[:, 0], d[:, 1])
-    plt.show()
+    all_data = []
+    for i in range(0, len(meteo_list)):
+        all_data.append(xtract_meteo("meteo/" + meteo_list[i]))
+        print(i/len(meteo_list) * 100, "%", end='\r')
+    all_data = np.concatenate(all_data)
+    all_data = all_data[all_data[:, 0].argsort()]
+    # plt.plot(all_data[:, 0], all_data[:, 1])
+    # plt.show()
+    np.savetxt("parsed_data.txt", all_data)
