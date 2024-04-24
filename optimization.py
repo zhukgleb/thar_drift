@@ -2,21 +2,26 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy import optimize
 from scipy import ndimage as ndi
-from skimage import filters
 from skimage import transform
 import os
-from skimage import data, color
 from astropy.io import fits
 from sklearn.preprocessing import Normalizer
+from astropy.time import Time
+from datetime import datetime as dt
 
+
+# Raw introduction....
 fits_list = os.listdir("data/")
-print(fits_list)
 data_list = []
+mjd_list = []
 
 for i in range(len(fits_list)):
     with fits.open("data/" + fits_list[i]) as hdul:
         d = hdul[0].data[0]
-        transformer = Normalizer().fit(d)
+        transformer = Normalizer().fit(d)  # Do normalization [0, 1] for adequate mse estimation
+        header = hdul[0].header
+        native = dt.strptime(header['DATE'].split(".")[0], "%Y-%m-%dT%H:%M:%S")
+        mjd_list.append(Time(native, scale="local").mjd)
         d = transformer.transform(d)
         data_list.append(d)
         print(d.shape)
@@ -27,11 +32,13 @@ for i in range(len(data_list)):
     if len(data_list[i][0]) * 1.1 < len(rep_fits[0]):
         data_list[i] = data_list[i].T
 
+
 def mse(arr1, arr2):
     """Compute the mean squared error between two arrays."""
     return np.mean((arr1 - arr2)**2)
 
 
+# Not good to use global rep point, but...
 def rep_fits_shift_error(shift, image):
     corrected = ndi.shift(image, (0, shift))
     return mse(rep_fits, corrected)
@@ -106,22 +113,25 @@ def align(reference, target, cost=cost_mse, nlevels=7, method='Powell'):
         print(f'Level: {n}, Angle: {np.rad2deg(res.x[0]) :.3}, '
               f'Offset: ({res.x[1] * 2**n :.3}, {res.x[2] * 2**n :.3}), '
               f'Cost: {res.fun :.3}', end='\r')
-
+    xo = res.x[1] * 2
+    yo = res.x[2] * 2
+    ang = np.rad2deg(res.x[0])
+    mre = res.fun
     print('')  # newline when alignment complete
-    return make_rigid_transform(p)
+    return make_rigid_transform(p), xo, yo, ang, mre
 
+
+xo_arr = []
+yo_arr = []
+
+opt_data = []
 for i in range(0, len(data_list)):
     shifted = data_list[i]
-    tf = align(rep_fits, shifted)
+    tf, xo, yo, ang, mre = align(rep_fits, shifted)
     corrected = transform.warp(shifted, tf, order=3)
+    xo_arr.append(xo)
+    yo_arr.append(yo)
+    opt_data.append([mjd_list[i], xo, yo, ang, mre])
+    
 
-# f, (ax0, ax1, ax2) = plt.subplots(1, 3)
-# ax0.imshow(rep_fits)
-# ax0.set_title('ref')
-# ax1.imshow(shifted)
-# ax1.set_title('not ref')
-# ax2.imshow(corrected)
-# ax2.set_title('compensated')
-# for ax in (ax0, ax1, ax2):
-#     ax.axis('off')
-# plt.show()
+np.savetxt("opt_data.txt", opt_data)
