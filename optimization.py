@@ -8,15 +8,32 @@ from astropy.io import fits
 from sklearn.preprocessing import Normalizer
 from astropy.time import Time
 from datetime import datetime as dt
-
+from grabber import analyze_folder
 
 # Raw introduction....
-fits_list = os.listdir("data/")
+# fits_list = os.listdir("/home/lambda/ccd/archive/20240424/")
+
+fits_list_comp = []
+archive_path = "/home/lambda/ccd/archive/"
+
+for night in os.listdir(archive_path):
+    print(archive_path + night)
+    fits_list_comp.append(analyze_folder(archive_path + night + "/"))
+
+fits_list = []  # Now flat'n our list
+for sublist in fits_list_comp:
+    for val in sublist:
+        fits_list.append(val)
+
+del fits_list_comp
+print(fits_list)
+
 data_list = []
 mjd_list = []
 
+
 for i in range(len(fits_list)):
-    with fits.open("data/" + fits_list[i]) as hdul:
+    with fits.open(fits_list[i]) as hdul:
         d = hdul[0].data[0]
         transformer = Normalizer().fit(d)  # Do normalization [0, 1] for adequate mse estimation
         header = hdul[0].header

@@ -53,4 +53,3 @@ if __name__ == "__main__":
     # plt.plot(all_data[:, 0], all_data[:, 1])
     # plt.show()
     np.savetxt("parsed_data.txt", all_data)
-
