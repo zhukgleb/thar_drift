@@ -23,7 +23,15 @@ def get_meteo(mjd_start: float, mjd_end: float, f_name: str="parsed_data.txt") -
 
 if __name__ == "__main__":
 #    pd = np.genfromtxt("parsed_data.txt")
-#    shift_data = get_thar_shifts("opt_data.txt")
+    shift_data = get_thar_shifts("opt_data_NES.txt")
     # plt.plot(pd[:, 0], pd[:, 6])
-#    plt.plot(shift_data[:, 0], shift_data[:, 1])
-#    plt.show()
+    pparam = dict(xlabel='Time, MJD', ylabel=r'Shift, pixels')
+    with plt.style.context(['retro', 'grid']):
+        fig, ax = plt.subplots()
+        ax.plot(shift_data[:, 0], shift_data[:, 1], color="crimson", label="X shift")
+        ax.plot(shift_data[:, 0], shift_data[:, 2], color="navy", label="Y shift")
+        ax.legend(title='Curves:')
+        ax.autoscale(tight=True)
+        ax.set(**pparam)
+    # fig.savefig('figures/fig11.jpg', dpi=300)
+    plt.show()
