@@ -3,8 +3,6 @@ from scipy import optimize
 from scipy import ndimage as ndi
 from skimage import transform
 
-# Works fine with numpy <= 1.23.2
-
 def mse(arr1, arr2):
     """Compute the mean squared error between two arrays."""
     return np.mean((arr1 - arr2)**2)
@@ -37,7 +35,6 @@ def gaussian_pyramid(image, levels=6):
     pyramid = [image]
 
     for level in range(levels - 1):
-        # blurred = ndi.gaussian_filter(image, sigma=2/3)
         image = downsample2x(image)
         pyramid.append(image)
 
@@ -79,6 +76,7 @@ def align(reference, target, cost=cost_mse, nlevels=7, method='Powell'):
         print(f'Level: {n}, Angle: {np.rad2deg(res.x[0]) :.3}, '
               f'Offset: ({res.x[1] * 2**n :.3}, {res.x[2] * 2**n :.3}), '
               f'Cost: {res.fun :.3}', end='\r')
+    # Unbound problem....
     xo = res.x[1] * 2
     yo = res.x[2] * 2
     ang = np.rad2deg(res.x[0])
