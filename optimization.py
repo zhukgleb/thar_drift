@@ -12,10 +12,10 @@ from opt_func import align
 # fits_list = os.listdir("/home/lambda/ccd/archive/20240424/")
 
 fits_list = []
-archive_path = "/home/lambda/ccd/archive/20240428"
+archive_path = "/home/lambda/ccd/archive/20240428/"
 
-for night in os.listdir(archive_path):
-    fits_list.append(analyze_folder(archive_path + "/"))
+#for night in os.listdir(archive_path):
+fits_list.append(analyze_folder(archive_path + "/"))
 
 # fits_list = []  # Now flat'n our list
 # for sublist in fits_list_comp:
@@ -25,7 +25,8 @@ for night in os.listdir(archive_path):
 #fits_list = os.listdir(archive_path)
 #fits_list = [archive_path + "/" + fits_list[i] for i in range(len(fits_list))]
 fits_list = fits_list[0]
-reap = fits_list.index("/home/lambda/ccd/archive/20240428/Bn20240428_001.fts")
+# reap = fits_list.index("/home/lambda/ccd/archive/tests/Bn20240428_007.fts")
+reap = 0
 
 data_list = []
 mjd_list = []
@@ -39,12 +40,13 @@ with fits.open(fits_list[reap]) as hdul:
     d = transformer.transform(d)
     data_list.append(d)
     rep_fits = d
+    print(f"reap fits is: {fits_list[reap]}")
 
 
 xo_arr = []
 yo_arr = []
 opt_data = []
-for i in range(0, len(fits_list)):
+for i in range(1, len(fits_list)):
     with fits.open(fits_list[i]) as hdul:
         print(fits_list[i])
         d = hdul[0].data[0]
@@ -57,7 +59,7 @@ for i in range(0, len(fits_list)):
             d = d.T
         print(d.shape)
         shifted = d
-        tf, xo, yo, ang, mre = align(rep_fits, shifted)
+        tf, xo, yo, ang, mre = align(rep_fits, d)
         corrected = transform.warp(shifted, tf, order=3)
         xo_arr.append(xo)
         yo_arr.append(yo)
