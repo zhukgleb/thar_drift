@@ -12,10 +12,10 @@ from opt_func import align
 # fits_list = os.listdir("/home/lambda/ccd/archive/20240424/")
 
 fits_list = []
-archive_path = "/home/lambda/ccd/archive/20240428/"
+archive_path = "/home/lambda/20240428/"
 
 #for night in os.listdir(archive_path):
-fits_list.append(analyze_folder(archive_path + "/"))
+fits_list.append(analyze_folder(archive_path))
 
 # fits_list = []  # Now flat'n our list
 # for sublist in fits_list_comp:
@@ -25,8 +25,9 @@ fits_list.append(analyze_folder(archive_path + "/"))
 #fits_list = os.listdir(archive_path)
 #fits_list = [archive_path + "/" + fits_list[i] for i in range(len(fits_list))]
 fits_list = fits_list[0]
-# reap = fits_list.index("/home/lambda/ccd/archive/tests/Bn20240428_007.fts")
-reap = 0
+print(fits_list)
+reap = fits_list.index("/home/lambda/20240428/Bn20240428_007.fts")
+# reap = 0
 
 data_list = []
 mjd_list = []
@@ -64,5 +65,7 @@ for i in range(1, len(fits_list)):
         xo_arr.append(xo)
         yo_arr.append(yo)
         opt_data.append([mjd_list[i], xo, yo, ang, mre])
+
+    print(f"{i/len(fits_list) * 100 :.2} %")
     
     np.savetxt("opt_data.txt", opt_data)

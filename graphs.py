@@ -27,10 +27,17 @@ def get_meteo(mjd_start: float, mjd_end: float, f_name: str="parsed_data.txt") -
 if __name__ == "__main__":
     data = get_thar_shifts("opt_data.txt")
     data_nes = get_thar_shifts("opt_data_NES.txt")
+    f, p = LS(data[:, 0], data[:, 1])
+    period_days = 1. / f
+    period_hours = period_days * 24
+    best_period = period_days[np.argmax(p)]
+    phase = calc_phase(data[:, 0], best_period * 24)
 
 
     with plt.style.context(['retro', 'grid']):
-        fig, ax = plt.subplots(nrows=2)
+        fig, ax = plt.subplots(nrows=3)
         ax[0].scatter(data[:, 0], data[:, 1])
-        ax[1].scatter(data_nes[:, 0], data_nes[:, 1])
+        # ax[0].scatter(data[:, 0], data[:, 2])
+        ax[1].plot(f, p)
+        ax[2].scatter(phase, data[:, 1])
         plt.show()
