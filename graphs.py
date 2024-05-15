@@ -26,7 +26,6 @@ def get_meteo(mjd_start: float, mjd_end: float, f_name: str="parsed_data.txt") -
 
 if __name__ == "__main__":
     data = get_thar_shifts("opt_data.txt")
-    data_nes = get_thar_shifts("opt_data_NES.txt")
     f, p = LS(data[:, 0], data[:, 1])
     period_days = 1. / f
     period_hours = period_days * 24
@@ -40,4 +39,11 @@ if __name__ == "__main__":
         # ax[0].scatter(data[:, 0], data[:, 2])
         ax[1].plot(f, p)
         ax[2].scatter(phase, data[:, 1])
+        plt.show()
+        fig, ax = plt.subplots(figsize=(8, 6))
+        ax.scatter(data[:, 0], data[:, 1], label="Order axis", color="navy")
+        ax.scatter(data[:, 0], data[:, 2], label="Dispersion axis", color="crimson")
+        ax.set_xticks()
+        plt.legend()
+        plt.tight_layout()
         plt.show()
