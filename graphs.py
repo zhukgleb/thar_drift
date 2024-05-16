@@ -48,6 +48,7 @@ if __name__ == "__main__":
         ax.xaxis.set_major_formatter(ticker.FormatStrFormatter('%0.1f'))
         loc = plticker.MultipleLocator(base=0.3)
         ax.xaxis.set_major_locator(loc)
+        plt.title("Shift spread")
         plt.xlabel("MJD")
         plt.ylabel("Shift, px")
         plt.legend()
@@ -57,10 +58,26 @@ if __name__ == "__main__":
         # Good data for demo's is from 60430.2 to 60430.6
         # Have a exponential grove and liniear plato
         from scipy import stats
+        fig, ax = plt.subplots(figsize=(8, 6))
+        plt.title("Night shifts")
         good_data = np.where((data[:, 0] >= 60430.25) & (data[:, 0] <= 60430.57))
         not_so_good_data = np.where((data[:, 0] >= 60430.2) & (data[:, 0] <= 60430.6))
         slope, intercept, r_value, p_value, std_err = stats.linregress(data[:, 0][good_data], data[:, 1][good_data])
-        plt.plot(data[:, 0][good_data], slope*data[:, 0][good_data] + intercept, color='red', label='Linear regression')  # Regression line
-        plt.scatter(data[:, 0][not_so_good_data], data[:, 1][not_so_good_data])
+        plt.plot(data[:, 0][not_so_good_data], slope*data[:, 0][not_so_good_data] + intercept, '--', color='black', label='Linear regression', linewidth=2)  # Regression line
+        plt.scatter(data[:, 0][not_so_good_data], data[:, 1][not_so_good_data], color='black', label="Not calm state")
+        plt.scatter(data[:, 0][good_data], data[:, 1][good_data], color='#009E73', label="Calm state")  # Line part
+        line_params = f'k = {slope:.2f}'
+        time = r'$\mathit{85~min}$'
+        # plt.text(1, 12, params_label, fontsize=12, color="blue")
+        props = dict(boxstyle='round', facecolor='white', alpha=0.5)
+        plt.text(data[:, 0][good_data][1], 5, line_params, bbox=props)
+        plt.text(data[:, 0][not_so_good_data][0], 4.3, time)
+        plt.text(data[:, 0][not_so_good_data][-6], 4.3, time)
+        ax.axvspan(data[:, 0][not_so_good_data][0] - 0.01, data[:, 0][good_data][0], facecolor='yellow', alpha=0.5)
+        ax.axvspan(data[:, 0][not_so_good_data][-1] + 0.025, data[:, 0][good_data][-1], facecolor='yellow', alpha=0.5)
+        ax.xaxis.set_major_formatter(ticker.FormatStrFormatter('%0.1f'))
+        loc = plticker.MultipleLocator(base=0.1)
+        plt.legend()
+        plt.tight_layout()
         plt.show()
         
