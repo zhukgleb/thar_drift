@@ -53,7 +53,7 @@ if __name__ == "__main__":
         plt.ylabel("Shift, px")
         plt.legend()
         plt.tight_layout()
-        plt.show()
+        plt.savefig("figures/shifts.pdf")
 
         # Good data for demo's is from 60430.2 to 60430.6
         # Have a exponential grove and liniear plato
@@ -70,14 +70,27 @@ if __name__ == "__main__":
         time = r'$\mathit{85~min}$'
         # plt.text(1, 12, params_label, fontsize=12, color="blue")
         props = dict(boxstyle='round', facecolor='white', alpha=0.5)
-        plt.text(data[:, 0][good_data][1], 5, line_params, bbox=props)
-        plt.text(data[:, 0][not_so_good_data][0], 4.3, time)
-        plt.text(data[:, 0][not_so_good_data][-6], 4.3, time)
+        plt.text(data[:, 0][good_data][2], 5, line_params, bbox=props)
+        plt.text(data[:, 0][not_so_good_data][4], 4, time, rotation='vertical')
+        plt.text(data[:, 0][not_so_good_data][-3], 4, time, rotation='vertical')
         ax.axvspan(data[:, 0][not_so_good_data][0] - 0.01, data[:, 0][good_data][0], facecolor='yellow', alpha=0.5)
         ax.axvspan(data[:, 0][not_so_good_data][-1] + 0.025, data[:, 0][good_data][-1], facecolor='yellow', alpha=0.5)
         ax.xaxis.set_major_formatter(ticker.FormatStrFormatter('%0.1f'))
         loc = plticker.MultipleLocator(base=0.1)
+        plt.xlabel("MJD")
+        plt.ylabel("Shift, px")
         plt.legend()
         plt.tight_layout()
-        plt.show()
-        
+        plt.savefig("figures/night_shifts.pdf")
+
+
+        # Lomb-Scargle periodogram and phase plot
+        fig, ax = plt.subplots(figsize=(8, 6), nrows=2)
+        ax[0].plot(f, p, color='black')
+        ax[0].set_xlabel("Events per day")
+        ax[0].set_ylabel("Power")
+        ax[1].scatter(phase, data[:, 1], color="black", alpha=0.9)
+        ax[1].set_xlabel("Phase")
+        ax[1].set_ylabel("Shift")
+        plt.tight_layout()
+        plt.savefig("figures/psd.pdf")
