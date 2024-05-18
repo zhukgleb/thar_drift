@@ -27,6 +27,7 @@ def get_meteo(mjd_start: float, mjd_end: float, f_name: str="parsed_data.txt") -
 
 
 if __name__ == "__main__":
+    save = False
     data = get_thar_shifts("opt_data.txt")
     f, p = LS(data[:, 0], data[:, 1])
     period_days = 1. / f
@@ -36,12 +37,6 @@ if __name__ == "__main__":
 
 
     with plt.style.context(['retro', 'grid']):
-#        fig, ax = plt.subplots(nrows=3)
-#        ax[0].scatter(data[:, 0], data[:, 1])
-        # ax[0].scatter(data[:, 0], data[:, 2])
-#        ax[1].plot(f, p)
-#        ax[2].scatter(phase, data[:, 1])
-#        plt.show()
         fig, ax = plt.subplots(figsize=(8, 6))
         ax.scatter(data[:, 0], data[:, 1], label="Order axis", color="navy")
         ax.scatter(data[:, 0], data[:, 2], label="Dispersion axis", color="crimson")
@@ -53,7 +48,10 @@ if __name__ == "__main__":
         plt.ylabel("Shift, px")
         plt.legend()
         plt.tight_layout()
-        plt.savefig("figures/shifts.pdf")
+        if save:
+            plt.savefig("figures/shifts.pdf")
+        else:
+            plt.show()
 
         # Good data for demo's is from 60430.2 to 60430.6
         # Have a exponential grove and liniear plato
@@ -81,7 +79,48 @@ if __name__ == "__main__":
         plt.ylabel("Shift, px")
         plt.legend()
         plt.tight_layout()
-        plt.savefig("figures/night_shifts.pdf")
+        if save:
+            plt.savefig("figures/night_shifts.pdf")
+        else:
+            plt.show()
+
+
+
+        # A Complex two line graph
+        fig, ax = plt.subplots(figsize=(8, 6))
+        plt.title("Night shifts")
+        good_data = np.where((data[:, 0] >= 60429.6) & (data[:, 0] <= 60430.2))
+        not_so_good_data = np.where((data[:, 0] >= 60429.6) & (data[:, 0] <= 60430.2))
+        slope_x, intercept_x, r_value_x, p_value_x, std_err_x = stats.linregress(data[:, 0][good_data], data[:, 1][good_data])
+        slope_y, intercept_y, r_value_y, p_value_y, std_err_y = stats.linregress(data[:, 0][good_data], data[:, 2][good_data])
+
+        # Regression part
+        plt.plot(data[:, 0][not_so_good_data], slope_x*data[:, 0][not_so_good_data] + intercept_x, '--', color='black', label='Linear regression', linewidth=2)  # Regression line
+        
+        # Data illustration part
+        plt.scatter(data[:, 0][not_so_good_data], data[:, 1][not_so_good_data], color='gray', label="Not calm state X")
+        plt.scatter(data[:, 0][not_so_good_data], data[:, 2][not_so_good_data], color='black', label="Not calm state")
+        plt.scatter(data[:, 0][good_data], data[:, 2][good_data], color='#009E73', label="Calm state")  # Line part
+        
+        line_params = f'k = {slope:.2f}'
+        time = r'$\mathit{85~min}$'
+        # plt.text(1, 12, params_label, fontsize=12, color="blue")
+        props = dict(boxstyle='round', facecolor='white', alpha=0.5)
+        plt.text(data[:, 0][good_data][2], 5, line_params, bbox=props)
+        plt.text(data[:, 0][not_so_good_data][4], 4, time, rotation='vertical')
+        plt.text(data[:, 0][not_so_good_data][-3], 4, time, rotation='vertical')
+        ax.axvspan(data[:, 0][not_so_good_data][0] - 0.01, data[:, 0][good_data][0], facecolor='yellow', alpha=0.5)
+        ax.axvspan(data[:, 0][not_so_good_data][-1] + 0.025, data[:, 0][good_data][-1], facecolor='yellow', alpha=0.5)
+        ax.xaxis.set_major_formatter(ticker.FormatStrFormatter('%0.1f'))
+        loc = plticker.MultipleLocator(base=0.1)
+        plt.xlabel("MJD")
+        plt.ylabel("Shift, px")
+        plt.legend()
+        plt.tight_layout()
+        if save:
+            plt.savefig("figures/night_shifts_y.pdf")
+        else:
+            plt.show()
 
 
         # Lomb-Scargle periodogram and phase plot
@@ -93,4 +132,7 @@ if __name__ == "__main__":
         ax[1].set_xlabel("Phase")
         ax[1].set_ylabel("Shift")
         plt.tight_layout()
-        plt.savefig("figures/psd.pdf")
+        if save:
+            plt.savefig("figures/psd.pdf")
+        else:
+            plt.show()
