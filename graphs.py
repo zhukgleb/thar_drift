@@ -89,26 +89,30 @@ if __name__ == "__main__":
         # A Complex two line graph
         fig, ax = plt.subplots(figsize=(8, 6))
         plt.title("Night shifts")
-        good_data = np.where((data[:, 0] >= 60429.6) & (data[:, 0] <= 60430.2))
-        not_so_good_data = np.where((data[:, 0] >= 60429.6) & (data[:, 0] <= 60430.2))
+        good_data = np.where((data[:, 0] >= 60429.62) & (data[:, 0] <= 60430.18))
+        not_so_good_data = np.where((data[:, 0] >= 60429.5) & (data[:, 0] <= 60430.3))
         slope_x, intercept_x, r_value_x, p_value_x, std_err_x = stats.linregress(data[:, 0][good_data], data[:, 1][good_data])
         slope_y, intercept_y, r_value_y, p_value_y, std_err_y = stats.linregress(data[:, 0][good_data], data[:, 2][good_data])
 
         # Regression part
-        plt.plot(data[:, 0][not_so_good_data], slope_x*data[:, 0][not_so_good_data] + intercept_x, '--', color='black', label='Linear regression', linewidth=2)  # Regression line
+        plt.plot(data[:, 0][not_so_good_data], slope_x*data[:, 0][not_so_good_data] + intercept_x, '--', color='#1e8cb0', label='Order regression', linewidth=2)  # Regression line
+        plt.plot(data[:, 0][not_so_good_data], slope_y*data[:, 0][not_so_good_data] + intercept_y, '--', color='#e953da', label='Dispersion regression', linewidth=2) 
         
         # Data illustration part
-        plt.scatter(data[:, 0][not_so_good_data], data[:, 1][not_so_good_data], color='gray', label="Not calm state X")
-        plt.scatter(data[:, 0][not_so_good_data], data[:, 2][not_so_good_data], color='black', label="Not calm state")
-        plt.scatter(data[:, 0][good_data], data[:, 2][good_data], color='#009E73', label="Calm state")  # Line part
+        plt.scatter(data[:, 0][not_so_good_data], data[:, 1][not_so_good_data], color='navy', label="Order axis")
+        plt.scatter(data[:, 0][not_so_good_data], data[:, 2][not_so_good_data], color='crimson', label="Dispersion axis")
+        # plt.scatter(data[:, 0][good_data], data[:, 2][good_data], color='#009E73', label="Calm state")  # Line part
         
-        line_params = f'k = {slope:.2f}'
+        line_params_x = f'Order line k = {slope_x:.2f}'
+        line_params_y = f'Dispersion line k = {slope_y:.2f}'
         time = r'$\mathit{85~min}$'
         # plt.text(1, 12, params_label, fontsize=12, color="blue")
         props = dict(boxstyle='round', facecolor='white', alpha=0.5)
-        plt.text(data[:, 0][good_data][2], 5, line_params, bbox=props)
+        plt.text(data[:, 0][good_data][2], 5.5, line_params_x, bbox=props)
+        plt.text(data[:, 0][good_data][2], 4.7, line_params_y, bbox=props)
+
         plt.text(data[:, 0][not_so_good_data][4], 4, time, rotation='vertical')
-        plt.text(data[:, 0][not_so_good_data][-3], 4, time, rotation='vertical')
+        plt.text(data[:, 0][not_so_good_data][-3], 4.2, time, rotation='vertical')
         ax.axvspan(data[:, 0][not_so_good_data][0] - 0.01, data[:, 0][good_data][0], facecolor='yellow', alpha=0.5)
         ax.axvspan(data[:, 0][not_so_good_data][-1] + 0.025, data[:, 0][good_data][-1], facecolor='yellow', alpha=0.5)
         ax.xaxis.set_major_formatter(ticker.FormatStrFormatter('%0.1f'))
