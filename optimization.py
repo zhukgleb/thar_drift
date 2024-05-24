@@ -12,7 +12,7 @@ from opt_func import align
 # fits_list = os.listdir("/home/lambda/ccd/archive/20240424/")
 
 fits_list = []
-archive_path = "/home/lambda/20240428/"
+archive_path = "/home/alpha/ccd/archive/20240428/"
 
 #for night in os.listdir(archive_path):
 fits_list.append(analyze_folder(archive_path))
@@ -26,7 +26,7 @@ fits_list.append(analyze_folder(archive_path))
 #fits_list = [archive_path + "/" + fits_list[i] for i in range(len(fits_list))]
 fits_list = fits_list[0]
 print(fits_list)
-reap = fits_list.index("/home/lambda/20240428/Bn20240428_007.fts")
+reap = fits_list.index("/home/alpha/ccd/archive/20240428/Bn20240428_007.fts")
 # reap = 0
 
 data_list = []
@@ -60,7 +60,7 @@ for i in range(1, len(fits_list)):
             d = d.T
         print(d.shape)
         shifted = d
-        tf, xo, yo, ang, mre = align(rep_fits, d)
+        tf, xo, yo, ang, mre = align(rep_fits, d, method='BH')
         corrected = transform.warp(shifted, tf, order=3)
         xo_arr.append(xo)
         yo_arr.append(yo)
@@ -69,3 +69,4 @@ for i in range(1, len(fits_list)):
     print(f"{i/len(fits_list) * 100 :.2} %")
     
     np.savetxt("opt_data.txt", opt_data)
+
