@@ -30,5 +30,8 @@ def astronaut_shift_error(shift):
     corrected = ndi.shift(shifted, (0, shift))
     return mse(astronaut, corrected)
 
-res = optimize.minimize(astronaut_shift_error, 0, method='Nelder-Mead')
-#print(f'Оптимальный сдвиг для коррекции составляет: {res.x}')
+
+
+if __name__ == "__main__":
+    res = optimize.minimize(astronaut_shift_error, 0, method='Nelder-Mead')
+    print(f'Оптимальный сдвиг для коррекции составляет: {res.x}')

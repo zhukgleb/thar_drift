@@ -69,4 +69,3 @@ for i in range(1, len(fits_list)):
     print(f"{i/len(fits_list) * 100 :.2} %")
     
     np.savetxt("opt_data.txt", opt_data)
-
