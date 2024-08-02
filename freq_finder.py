@@ -4,7 +4,7 @@ from astropy.timeseries import LombScargle
 
 def LS(t: np.ndarray, y: np.ndarray):
     ls = LombScargle(t, y)
-    freq, power = ls.autopower()
+    freq, power = ls.autopower(minimum_frequency=100)
     return freq, power
 
 

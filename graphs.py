@@ -1,11 +1,11 @@
 import matplotlib.pyplot as plt
 import numpy as np
-import scienceplots
 from matplotlib import rc
 from freq_finder import LS, calc_phase
 from scipy.signal import find_peaks
 import matplotlib.ticker as ticker
 import matplotlib.ticker as plticker
+import scienceplots
 
 
 plt.style.use("science")
@@ -26,10 +26,11 @@ def get_meteo(mjd_start: float, mjd_end: float, f_name: str="parsed_data.txt") -
                                (meteo_data[:, 0] <=mjd_end))]
 
 
+
 if __name__ == "__main__":
     save = False
     data = get_thar_shifts("opt_data.txt")
-    f, p = LS(data[:, 0], data[:, 1])
+    f, p = LS(data[:, 0], data[:, 2])
     period_days = 1. / f
     period_hours = period_days * 24
     best_period = period_days[np.argmax(p)]
@@ -140,3 +141,11 @@ if __name__ == "__main__":
             plt.savefig("figures/psd.pdf")
         else:
             plt.show()
+
+        
+        # Coord drift
+
+        plt.plot(data[:, 1], data[:, 2])
+        plt.show()
+        plt.plot(data[:, 0], data[:, 4])
+        plt.show()

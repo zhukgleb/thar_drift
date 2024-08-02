@@ -73,9 +73,9 @@ def align(reference, target, cost=cost_mse, nlevels=7, method='Powell'):
             res = optimize.minimize(cost, p, args=(ref, tgt), method='Powell')
         p = res.x
         # print current level, overwriting each time (like a progress bar)
-        print(f'Level: {n}, Angle: {np.rad2deg(res.x[0]) :.3}, '
-              f'Offset: ({res.x[1] * 2**n :.3}, {res.x[2] * 2**n :.3}), '
-              f'Cost: {res.fun :.3}', end='\r')
+        # print(f'Level: {n}, Angle: {np.rad2deg(res.x[0]) :.3}, '
+        #       f'Offset: ({res.x[1] * 2**n :.3}, {res.x[2] * 2**n :.3}), '
+        #       f'Cost: {res.fun :.3}', end='\r')
     # Unbound problem....
     xo = res.x[1] * 2
     yo = res.x[2] * 2
@@ -83,4 +83,3 @@ def align(reference, target, cost=cost_mse, nlevels=7, method='Powell'):
     mre = res.fun
     print('')  # newline when alignment complete
     return make_rigid_transform(p), xo, yo, ang, mre
-
