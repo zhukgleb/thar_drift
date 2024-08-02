@@ -13,8 +13,8 @@ from multiprocessing import Pool, cpu_count
 # fits_list = os.listdir("/home/lambda/ccd/archive/20240424/")
 
 fits_list = []
-# archive_path = "/home/alpha/ccd/archive/20240428/"
-archive_path = "/home/lambda/20240428/"
+archive_path = "/home/alpha/ccd/archive/20240428/"
+# archive_path = "/home/lambda/20240428/"
 
 #for night in os.listdir(archive_path):
 fits_list.append(analyze_folder(archive_path))
@@ -22,8 +22,8 @@ fits_list.append(analyze_folder(archive_path))
 # Flatten the list
 fits_list = fits_list[0]
 
-# reap = fits_list.index("/home/alpha/ccd/archive/20240428/Bn20240428_007.fts")
-reap = fits_list.index("/home/lambda/20240428/Bn20240428_007.fts")
+reap = fits_list.index("/home/alpha/ccd/archive/20240428/Bn20240428_007.fts")
+# reap = fits_list.index("/home/lambda/20240428/Bn20240428_007.fts")
 
 data_list = []
 mjd_list = []
@@ -58,12 +58,12 @@ def process_file(file):
         shifted = d
         tf, xo, yo, ang, mre = align(rep_fits, d, method='BH')
         corrected = transform.warp(shifted, tf, order=3)
-        return mjd, xo, yo, ang, mre
+        return mjd, xo, yo, ang, mre, file
 
 def write_to_file(result):
-    mjd, xo, yo, ang, mre = result
+    mjd, xo, yo, ang, mre, fname = result
     with open("opt_data.txt", "a") as f:
-        f.write(f"{mjd}\t{xo}\t{yo}\t{ang}\t{mre}\n")
+        f.write(f"{mjd}\t{xo}\t{yo}\t{ang}\t{mre}\t{fname}\n")
 
 # Using Pool from multiprocessing to parallelize file processing
 files_done = 0
@@ -72,4 +72,4 @@ if __name__ == "__main__":
         for result in pool.imap(process_file, fits_list[1:]):
             write_to_file(result)
             files_done+=1
-            print(f"{files_done / len(fits_list) * 100.2f} %")
+            print(f"{files_done / len(fits_list) * 100} %", end="\r")
