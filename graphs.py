@@ -6,6 +6,7 @@ from scipy.signal import find_peaks
 import matplotlib.ticker as ticker
 import matplotlib.ticker as plticker
 import scienceplots
+from grabber import get_data_from_fits
 
 
 plt.style.use("science")
@@ -29,8 +30,9 @@ def get_meteo(mjd_start: float, mjd_end: float, f_name: str="parsed_data.txt") -
 
 if __name__ == "__main__":
     save = False
+    show = True
+
     data = get_thar_shifts("opt_data.txt")
-    print(data)
     f, p = LS(data["mjd"], data["x_shift"])
     period_days = 1. / f
     period_hours = period_days * 24
@@ -52,7 +54,7 @@ if __name__ == "__main__":
         plt.tight_layout()
         if save:
             plt.savefig("figures/shifts.pdf")
-        else:
+        if show:
             plt.show()
 
         # Good data for demo's is from 60430.2 to 60430.6
@@ -83,7 +85,7 @@ if __name__ == "__main__":
         plt.tight_layout()
         if save:
             plt.savefig("figures/night_shifts.pdf")
-        else:
+        if show:
             plt.show()
 
 
@@ -125,7 +127,7 @@ if __name__ == "__main__":
         plt.tight_layout()
         if save:
             plt.savefig("figures/night_shifts_y.pdf")
-        else:
+        if show:
             plt.show()
 
 
@@ -140,10 +142,9 @@ if __name__ == "__main__":
         plt.tight_layout()
         if save:
             plt.savefig("figures/psd.pdf")
-        else:
+        if show:
             plt.show()
 
-        
         # Coord drift
 
 #        plt.plot(data["x_shift"], data[:, 2])
@@ -155,4 +156,17 @@ if __name__ == "__main__":
         # Diffirence graph
         max_x_diff_fits = data[np.where(data["x_shift"] == max(data["x_shift"]))]
         min_x_diff_fits = data[np.where(data["x_shift"] == min(data["x_shift"]))]
-        print(min_x_diff_fits, max_x_diff_fits)
+        min_x_data = get_data_from_fits(min_x_diff_fits["fname"][0])
+        max_x_data = get_data_from_fits(max_x_diff_fits["fname"][0])
+
+        diff_data  = max_x_data - min_x_data
+
+        fig, ax = plt.subplots(figsize=(8, 6), ncols=2)
+
+        ax[0].imshow(diff_data)
+        levels = np.linspace(diff_data.min(), diff_data.max(), 50)  # 5 levels
+        contour = ax[1].contour(diff_data, levels=levels, cmap='viridis', linewidths=1.5)
+        fig.colorbar(contour, ax=ax[1])  # Добавление цветовой шкалы к первому графику
+        ax[1].invert_yaxis()
+        if show:
+            plt.show()

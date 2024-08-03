@@ -24,6 +24,10 @@ def isitthar(path2fits: str) -> bool:
             False
         
 
+# IF COURSE it's stupid. But now we have only NES images....
+def get_data_from_fits(path2fits: str) -> np.ndarray:
+    with fits.open(path2fits) as hdul:
+        return hdul[0].data[0]
 
 if __name__ == "__main__":
     analyze_folder("/home/lambda/ccd/archive/20210224/")
