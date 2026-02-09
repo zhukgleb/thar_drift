@@ -14,13 +14,16 @@ def get_bias(path2bias: str):
 def get_superbias(path2biases: str):
     biases_list = make_fits_list(path2biases)
     bias_data = []
+    sb_data = []
     for file in biases_list: 
         bias_data.append(get_bias(file))
-        
-    print(bias_data)
+        sb_data.append(get_bias(file)[0])
 
+    
+    sb = sum(sb_data) / len(sb_data)
+    return sb, bias_data
 
 
 
 if __name__ == "__main__":
-    get_superbias("/home/alpha/thar_drift/data/bias/")
+    sb, b_data = get_superbias("/home/alpha/thar_drift/data/bias/")
