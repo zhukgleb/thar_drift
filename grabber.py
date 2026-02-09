@@ -15,19 +15,37 @@ def analyze_folder(path2data: str) -> list:
     return thar_list
 
 
+def make_fits_list(path2data: str) -> list:
+    fits_list = []
+    for file in os.listdir(path2data):
+        try:
+            fits_list.append(path2data + file)
+        except OSError:
+            pass
+
+    return fits_list
+
+
 def isitthar(path2fits: str) -> bool:
     with fits.open(path2fits) as hdul:
         header = hdul[0].header
-        if header['IMAGETYP'] == 'thar':
+        if header["IMAGETYP"] == "thar":
             return True
         else:
             False
-        
+
 
 # IF COURSE it's stupid. But now we have only NES images....
 def get_data_from_fits(path2fits: str) -> np.ndarray:
     with fits.open(path2fits) as hdul:
         return hdul[0].data[0]
 
+
+def get_data_from_fits_esp(path2fits: str) -> np.ndarray:
+    with fits.open(path2fits) as hdul:
+        return hdul[0].data
+
+
 if __name__ == "__main__":
     analyze_folder("/home/lambda/ccd/archive/20210224/")
+
