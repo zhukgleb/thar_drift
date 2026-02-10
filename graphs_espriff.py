@@ -92,8 +92,7 @@ if __name__ == "__main__":
         if save:
             plt.savefig("figures/flex.pdf")
 
-
-       fig, ax = plt.subplots(figsize=(6, 6))
+        fig, ax = plt.subplots(figsize=(6, 6))
 
         plt.title("Bias")
         plt.xlabel("Zenith distance")
@@ -108,8 +107,6 @@ if __name__ == "__main__":
             plt.show()
         if save:
             plt.savefig("figures/bias_darks.pdf")
-
-
 
         # Good data for demo's is from 60430.2 to 60430.6
         # Have a exponential grove and liniear plato
