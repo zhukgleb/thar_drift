@@ -44,8 +44,8 @@ def get_meteo(
 
 
 if __name__ == "__main__":
-    save = False
-    show = True
+    save = True
+    show = False
 
     data = get_thar_shifts("opt_data_esp_reverse.txt")
     f, p = LS(data["mjd"], data["x_shift"])
@@ -54,7 +54,7 @@ if __name__ == "__main__":
     best_period = period_days[np.argmax(p)]
     phase = calc_phase(data["mjd"], best_period * 24)
 
-    with plt.style.context(["retro", "grid"]):
+    with plt.style.context(["science", "grid"]):
         fig, ax = plt.subplots(figsize=(8, 6))
         ax.scatter(data["mjd"], data["x_shift"], label="Dispersion axis", color="navy")
         ax.scatter(data["mjd"], data["y_shift"], label="Order axis", color="crimson")
@@ -81,10 +81,10 @@ if __name__ == "__main__":
         plt.title("Total flexure of ESPriF")
         plt.xlabel("Zenith distance")
         plt.ylabel("Shift, px")
-        ax.scatter(data["z"], data["x_shift"], label="Dispersion axis", marker="D")
-        ax.plot(data["z"], data["x_shift"])
-        ax.scatter(data["z"], data["y_shift"], label="Order axis", marker="s")
-        ax.plot(data["z"], data["y_shift"])
+        ax.scatter(data["z"], data["x_shift"], label="Dispersion axis", marker="D", color="crimson")
+        ax.plot(data["z"], data["x_shift"], color="crimson")
+        ax.scatter(data["z"], data["y_shift"], label="Order axis", marker="s", color="navy")
+        ax.plot(data["z"], data["y_shift"], color="navy")
         plt.legend()
         plt.tight_layout()
         if show:
@@ -92,24 +92,7 @@ if __name__ == "__main__":
         if save:
             plt.savefig("figures/flex.pdf")
 
-        fig, ax = plt.subplots(figsize=(6, 6))
 
-        plt.title("Bias")
-        plt.xlabel("Zenith distance")
-        plt.ylabel("Shift, px")
-        ax.scatter(data["z"], data["x_shift"], label="Dispersion axis", marker="D")
-        ax.plot(data["z"], data["x_shift"])
-        ax.scatter(data["z"], data["y_shift"], label="Order axis", marker="s")
-        ax.plot(data["z"], data["y_shift"])
-        plt.legend()
-        plt.tight_layout()
-        if show:
-            plt.show()
-        if save:
-            plt.savefig("figures/bias_darks.pdf")
-
-        # Good data for demo's is from 60430.2 to 60430.6
-        # Have a exponential grove and liniear plato
         from scipy import stats
 
         # Coord drift
@@ -120,21 +103,23 @@ if __name__ == "__main__":
         #        plt.show()
 
         # Diffirence graph
-#        max_x_diff_fits = data[np.where(data["x_shift"] == max(data["x_shift"]))]
-#        min_x_diff_fits = data[np.where(data["x_shift"] == min(data["x_shift"]))]
-#        min_x_data = get_data_from_fits_esp(min_x_diff_fits["fname"][0])
-#        max_x_data = get_data_from_fits_esp(max_x_diff_fits["fname"][0])
+    with plt.style.context(["science"]):
 
-#        diff_data = max_x_data - min_x_data
+        max_x_diff_fits = data[np.where(data["x_shift"] == max(data["x_shift"]))]
+        min_x_diff_fits = data[np.where(data["x_shift"] == min(data["x_shift"]))]
+        min_x_data = get_data_from_fits_esp(min_x_diff_fits["fname"][0])
+        max_x_data = get_data_from_fits_esp(max_x_diff_fits["fname"][0])
 
-#       fig, ax = plt.subplots(figsize=(8, 6), ncols=2)
+        diff_data = max_x_data - min_x_data
 
-#       ax[0].imshow(diff_data)
-#       levels = np.linspace(diff_data.min(), diff_data.max(), 50)  # 5 levels
-#       contour = ax[1].contour(
-#           diff_data, levels=levels, cmap="viridis", linewidths=1.5
-#       )
-#       fig.colorbar(contour, ax=ax[1])  # Добавление цветовой шкалы к первому графику
-#       ax[1].invert_yaxis()
-#       if show:
-#           plt.show()
+        fig, ax = plt.subplots(figsize=(8, 12), ncols=2)
+        print(diff_data[1000:1200])
+        cax = ax[0].imshow(diff_data)
+        cax = ax[1].imshow(diff_data[1000:1200, 1000:1200])
+        ax[0].set_title("Max shift - min shift difference")
+        ax[1].set_title("Local difference")
+        plt.tight_layout()
+        if show:
+            plt.show()
+        if save:
+            plt.savefig("figures/diffmapx.pdf")
