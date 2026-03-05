@@ -14,7 +14,7 @@ from multiprocessing import Pool, cpu_count
 
 fits_list = []
 # archive_path = "/home/alpha/ccd/archive/20240428/"
-archive_path = "/home/alpha/thar_drift/data/espriff/"
+archive_path = "/home/alpha/thar_drift/data/20260303/"
 # archive_path = "/home/lambda/20240428/"
 
 # for night in os.listdir(archive_path):
@@ -23,7 +23,7 @@ fits_list.append(make_fits_list(archive_path))
 # Flatten the list
 fits_list = fits_list[0]
 
-reap = fits_list.index("/home/alpha/thar_drift/data/espriff/Be20260202_016t.fits")
+reap = fits_list.index("/home/alpha/thar_drift/data/20260303/Be20260303_001t.fits")
 # reap = fits_list.index("/home/lambda/20240428/Bn20240428_007.fts")
 
 data_list = []
@@ -73,7 +73,7 @@ def process_file(file):
 
 def write_to_file(result):
     mjd, z, xo, yo, ang, mre, fname = result
-    with open("opt_data_esp_reverse.txt", "a") as f:
+    with open("opt_data_epsriff_raw.txt", "a") as f:
         f.write(f"{mjd}\t{z}\t{xo}\t{yo}\t{ang}\t{mre}\t{fname}\n")
 
 

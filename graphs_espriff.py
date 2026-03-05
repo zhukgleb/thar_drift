@@ -44,10 +44,10 @@ def get_meteo(
 
 
 if __name__ == "__main__":
-    save = True
-    show = False
+    save = False
+    show = True
 
-    data = get_thar_shifts("opt_data_esp_reverse.txt")
+    data = get_thar_shifts("opt_data_epsriff_raw.txt")
     f, p = LS(data["mjd"], data["x_shift"])
     period_days = 1.0 / f
     period_hours = period_days * 24
